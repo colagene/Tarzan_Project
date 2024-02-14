@@ -1,0 +1,84 @@
+version: '3.8'
+
+services:
+  ui:
+    container_name: tarzan-ui
+    image: devopseasylearning/tarzan-ui:v0.0.1
+    environment:
+      - AUTH_HOST=auth
+      - AUTH_PORT=8080
+      - WEATHER_HOST=weather
+      - WEATHER_PORT=5000
+      - REDIS_USER=redis
+      - REDIS_PASSWORD=redis
+    expose:
+      - 3000
+    ports:
+      - "3000:3000"
+    networks:
+      - tarzan
+    restart: always
+    depends_on:
+      - auth
+
+  auth:
+    container_name: tarzan-auth
+    image: devopseasylearning/tarzan-auth:v0.0.1
+    environment:
+      - DB_HOST=db
+      - DB_PASSWORD=my-secret-pw
+    expose:
+      - 8080
+    # ports:
+    #   - "3306:3306"
+    networks:
+      - tarzan
+    restart: always
+    depends_on:
+      - weather
+
+  db:
+    container_name: tarzan-db
+    image: mysql:8.0.2
+    environment:
+      - MYSQL_ROOT_PASSWORD=my-secret-pw
+    volumes:
+      - db_data:/var/lib/mysql  # Persist MySQL data to named volume
+    networks:
+      - tarzan
+    restart: always
+
+  weather:
+    container_name: tarzan-weather
+    image: devopseasylearning/tarzan-weather:v0.0.2
+    expose:
+      - 5000
+    environment:
+      - APIKEY=ecbc396f46mshb65cbb1f82cf334p1fcc87jsna5e962a3c542
+    networks:
+      - tarzan
+    restart: always
+    depends_on:
+      - db
+
+  redis:
+    container_name: tarzan-redis
+    image: redis
+    environment:
+      - REDIS_USER=redis
+      - REDIS_PASSWORD=redis
+    volumes:
+      - redis_data:/data        # Persist Redis data to named volume
+    networks:
+      - tarzan
+    restart: always
+    depends_on:
+      - ui
+
+networks:
+  tarzan:
+    driver: bridge
+
+volumes:
+  db_data:    # Define named volume for MySQL data persistence
+  redis_data: # Define named volume for Redis data persistence

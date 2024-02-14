@@ -1,0 +1,7 @@
+# Dockerfile.redis
+FROM redis
+
+ENV REDIS_USER=redis \
+    REDIS_PASSWORD=redis
+
+EXPOSE 6379

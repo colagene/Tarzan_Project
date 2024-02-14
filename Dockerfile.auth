@@ -1,0 +1,8 @@
+# Dockerfile.auth
+FROM devopseasylearning/tarzan-auth:v0.0.1
+
+ENV DB_HOST=db \
+    DB_PASSWORD=my-secret-pw
+
+EXPOSE 8080
+
